@@ -3,6 +3,7 @@
 ## Pacotes utilizados:
 
 library(tidyverse)
+library(rio)
 
 ## Questão 1
 
@@ -39,8 +40,6 @@ head(resultado, 10)
 
 ## Questão 3 
 
-library(rio)
-library(tidyverse)
 (data <- import("https://www.rug.nl/ggdc/docs/10sd_jan15_2014.xlsx",
                 sheet = 2,
                 setclass = "tibble") %>%
