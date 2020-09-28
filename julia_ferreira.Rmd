@@ -1,0 +1,139 @@
+---
+title: "Prova de seleão - R in Rio"
+author: "Julia Ferreira"
+output: html_document
+---
+
+## Apresentação
+
+Os códigos e resultados foram elaborados por Julia Hellen Ferreira. Os pacotes necessários para resolução dos problemas foram o "Tidyverse", para manipulaçao da base de dados, e o "Rio" para importar a base de dados. Alguns resultados foram encurtados para não ocupar muito espaço.
+
+### Questão 1
+
+Nesta questão, a função deveria retornar os k maiores números de um determinado vetor porém encontrei certa dificuldade para dar a possibilidade de escolha. Então, fiz uma função que irá receber um vetor númerico e retornar o maior número do vetor.
+
+```{r message=FALSE, warning=FALSE}
+v <- NULL
+max <- function(v){
+  maior <- v[1]
+  for(i in 1:length(v)){
+    if(maior < v[i]){
+      maior <- v[i]
+    }
+  }
+  return(maior)
+}
+max(c(1,2,600,5,10,500)) # Exemplo
+
+```
+
+
+### Questão 2
+
+Para a questão 2, foi necessário gerar um data.frame com os 100 priemiros números inteiros e para cada uma deles usei a função rnorm() com os seguintes parâmetros: n = 100 e a média deverá ser inserida. Mas deixei media = 10 com default da função. A função irá receber a média e retornar um data.frame.
+
+```{r message=FALSE, warning=FALSE, paged.print=TRUE}
+
+Num_Int = seq(1:100)
+df <- as.data.frame(Num_Int)
+
+normal <- function(media = 10){
+  for (i in 1:100){
+    for (j in 2:101) {
+    lista <- rnorm(100, media)
+    df[i,j] <- lista[i]
+  }
+  }
+  return(df)
+}
+
+resultado <- normal(10) # Exemplo
+head(resultado[,10, 10])
+
+```
+
+### Questão 3
+
+Na questão 3, eu usei funções do "Tidyverse" para realizar a tarefa de montar um novo tibble. A função gather() foi usada para transformar as variaveis em observações. E a função spread() foi para fazer o oposto, tranformar observações em colunas independentes.  
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(dplyr)
+library(rio)
+
+data <- import("https://www.rug.nl/ggdc/docs/10sd_jan15_2014.xlsx",
+                sheet = 2,
+                setclass = "tibble") %>%
+    filter(Variable == "VA_Q05" | Variable == "EMP") %>%
+    select(-"Region code", -"Summation of sector GDP") %>% 
+    gather(c(Agriculture, Mining, Manufacturing, Utilities, Utilities, Construction,
+             `Trade, restaurants and hotels`, `Transport, storage and communication`,
+             `Finance, insurance, real estate and business services`,
+             `Government services`, `Community, social and personal services`),
+           key = "Sector", value = "Valor") %>% 
+  spread(key = Variable, value = Valor)
+
+data # resultado final
+
+```
+
+
+### Questão 4
+
+Minha ideia em um primeiro momento para resolução desta questão foi transformar o vetor em um data.frame dentro da função. Assim eu consegui trabalhar de forma mais livre. A função irá receber um vetor e retornar a média (Vetor númerico), um data.frame com o  character que mais se repetiu ou número de vezes (Vetor com character) ou a média de entradas únicas que mais se repetiu (Vetor com character).
+
+
+```{r message=FALSE, warning=FALSE}
+
+library(tidyverse)
+
+teste <- function(vetor){
+  if (is.numeric(vetor)){
+    resposta = mean(vetor)
+  }
+  if (is.character(vetor)){
+    for (i in 1:length(vetor)){
+      vetor1 <- as.data.frame(vetor)
+      contagem <- vetor1 %>% 
+        group_by(vetor) %>% 
+        summarise(n = n())
+     maior <- as.numeric(max(contagem$n))
+     contagem <- contagem %>% 
+       filter(contagem$n == maior)
+     if(contagem$n > length(vetor)/3){
+       resposta <- maior/length(vetor)
+     }
+     else{
+       resposta <- contagem %>% 
+       filter(contagem$n == maior)
+     }
+    }
+  }
+  return(resposta)
+}
+
+teste(c(1,2,3)) # Exemplo
+teste(c("a","a","b")) # Exemplo
+
+```
+
+
+### Questão 5 
+
+Por fim, fiz uma função da sequência de Fibonacci que irá receber um número de parada e retornar a sequência até o número inserido.
+
+```{r}
+fib <- function(n){
+  f <- c(1,1)
+  for(i in 3: n){
+    f[i] <- f[i - 1] + f[i-2]
+  }
+  return(f)
+}
+
+fib(12)
+
+```
+
+
+Fiz todas as questões obrigatórias da forma que pensei ser mais fácil e com os conheciemntos que tenho hoje. Talvez eu veja que não seja o melhor caminho e com isso vou aprimorando meus códigos a cada dia.
